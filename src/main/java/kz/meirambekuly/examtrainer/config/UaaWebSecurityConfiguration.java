@@ -1,9 +1,10 @@
-package kz.meirambekuly.examtrainer.config.security;
+package kz.meirambekuly.examtrainer.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import kz.meirambekuly.examtrainer.config.security.MCryptPasswordEncoder;
 import kz.meirambekuly.examtrainer.utils.JwtTokenUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
