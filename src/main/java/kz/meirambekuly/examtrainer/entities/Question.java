@@ -27,6 +27,7 @@ public class Question {
 
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "examId", referencedColumnName = "id")
     private Exam exam;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -34,7 +35,11 @@ public class Question {
 
     @JsonIgnore
     @OneToOne
+    @JoinColumn(name = "correctAnswerId", referencedColumnName = "id")
     private Answer correctAnswer;
+
+    @Column(name = "weight")
+    private Double weight;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
     private Calendar createdDate;

@@ -24,6 +24,7 @@ public class Answer {
 
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "questionId", referencedColumnName = "id")
     private Question question;
 
     @Size(min = 1, max = 50, message = "The answer should be less than 50 characters")

@@ -62,6 +62,11 @@ public class UaaConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/account/**").authenticated()
+                .antMatchers("/api/question/**").authenticated()
+                .antMatchers("/api/subject/**").authenticated()
+                .antMatchers("/api/exam/**").authenticated()
+                .antMatchers("/api/answer/**").authenticated()
                 .anyRequest().denyAll();
     }
 

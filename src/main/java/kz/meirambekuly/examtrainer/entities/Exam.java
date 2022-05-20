@@ -24,6 +24,7 @@ public class Exam {
 
     @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "subjectId", referencedColumnName = "id")
     private Subject subject;
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
