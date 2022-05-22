@@ -1,6 +1,6 @@
 package kz.meirambekuly.examtrainer.web.rest;
 
-import kz.meirambekuly.examtrainer.services.impl.IUserService;
+import kz.meirambekuly.examtrainer.services.UserService;
 import kz.meirambekuly.examtrainer.utils.JwtTokenUtils;
 import kz.meirambekuly.examtrainer.utils.StringUtils;
 import kz.meirambekuly.examtrainer.web.dto.ResponseDto;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final IUserService userService;
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
