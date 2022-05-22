@@ -23,14 +23,20 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable("id")Long id) {
+    @GetMapping("/id")
+    public ResponseEntity<?> findById(@RequestParam("id") Long id) {
         return ResponseEntity.ok(questionService.findById(id));
     }
 
+    @GetMapping("/answers")
+    public ResponseEntity<?> findAnswers(@RequestParam("id") Long id){
+        return ResponseEntity.ok(questionService.findAnswers(id));
+    }
+
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestBody QuestionDto questionDto){
-        return ResponseEntity.ok(questionService.update(questionDto));
+    public ResponseEntity<?> update(@RequestParam("id") Long id,
+                                    @RequestBody QuestionDto questionDto){
+        return ResponseEntity.ok(questionService.update(id, questionDto));
     }
 
     @DeleteMapping("/delete")

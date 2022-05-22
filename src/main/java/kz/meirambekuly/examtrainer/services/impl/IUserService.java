@@ -48,13 +48,13 @@ public class IUserService implements UserService {
     }
 
     @Override
-    public ResponseDto register(UserDto dto) {
+    public ResponseDto<?> register(UserDto dto) {
         Optional<User> optionalUser = userRepository.findByUsername(dto.getUsername());
         if(optionalUser.isEmpty()){
             User user = User.builder()
                     .firstName(dto.getFirstName())
                     .lastName(dto.getLastName())
-                    .username(dto.getLastName())
+                    .username(dto.getUsername())
                     .password(passwordEncoder.encode(dto.getPassword()))
                     .role(roleRepository.getById(1L))
                     .build();
@@ -73,7 +73,7 @@ public class IUserService implements UserService {
     }
 
     @Override
-    public ResponseDto getToken() {
+    public ResponseDto<?> getToken() {
         if (SecurityUtils.isAuthenticated()) {
             String token = JwtTokenUtils.generateJwt(SecurityUtils.getCurrentUserLogin(), SecurityUtils.getAuthorities());
             return ResponseDto.builder()
@@ -90,7 +90,7 @@ public class IUserService implements UserService {
     }
 
     @Override
-    public ResponseDto getLoggedUserInformation() {
+    public ResponseDto<?> getLoggedUserInformation() {
         Optional<User> user = userRepository.findByUsername(SecurityUtils.getCurrentUserLogin());
         if (user.isPresent()) {
             UserDto dto = ObjectMapper.convertToUserDto(user.get());
@@ -109,16 +109,16 @@ public class IUserService implements UserService {
 
     @Transactional
     @Override
-    public ResponseDto updateUser(UserDto dto) {
+    public ResponseDto<?> updateUser(UserDto dto) {
         Optional<User> user = userRepository.findByUsername(SecurityUtils.getCurrentUserLogin());
         if (user.isPresent()) {
-            if (!dto.getUsername().isEmpty()) {
+            if (!StringUtils.isEmpty(dto.getUsername())) {
                 user.get().setUsername(dto.getUsername());
             }
-            if (!dto.getFirstName().isEmpty()) {
+            if (!StringUtils.isEmpty(dto.getFirstName())) {
                 user.get().setFirstName(dto.getFirstName());
             }
-            if (!dto.getLastName().isEmpty()) {
+            if (!StringUtils.isEmpty(dto.getLastName())) {
                 user.get().setLastName(dto.getLastName());
             }
             userRepository.save(user.get());

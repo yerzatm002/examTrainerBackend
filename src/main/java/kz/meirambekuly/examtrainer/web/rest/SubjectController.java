@@ -23,14 +23,20 @@ public class SubjectController {
         return ResponseEntity.ok(subjectService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable("id") Long id){
+    @GetMapping("/id")
+    public ResponseEntity<?> findById(@RequestParam("id") Long id){
         return ResponseEntity.ok(subjectService.findById(id));
     }
 
+    @GetMapping("/exams")
+    public ResponseEntity<?> findExams(@RequestParam("id") Long id){
+        return ResponseEntity.ok(subjectService.findExams(id));
+    }
+
     @PutMapping("/update")
-    public ResponseEntity<?> update(@RequestBody SubjectDto subjectDto){
-        return ResponseEntity.ok(subjectService.update(subjectDto));
+    public ResponseEntity<?> update(@RequestParam("id")Long id,
+                                    @RequestBody SubjectDto subjectDto){
+        return ResponseEntity.ok(subjectService.update(subjectDto, id));
     }
 
     @DeleteMapping("/delete")

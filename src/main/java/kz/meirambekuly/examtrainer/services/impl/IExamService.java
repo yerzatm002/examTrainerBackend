@@ -1,10 +1,13 @@
 package kz.meirambekuly.examtrainer.services.impl;
 
 import kz.meirambekuly.examtrainer.entities.Exam;
+import kz.meirambekuly.examtrainer.entities.Subject;
 import kz.meirambekuly.examtrainer.repositories.ExamRepository;
+import kz.meirambekuly.examtrainer.repositories.SubjectRepository;
 import kz.meirambekuly.examtrainer.services.ExamService;
 import kz.meirambekuly.examtrainer.utils.ObjectMapper;
 import kz.meirambekuly.examtrainer.web.dto.ExamDto;
+import kz.meirambekuly.examtrainer.web.dto.QuestionDto;
 import kz.meirambekuly.examtrainer.web.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +23,16 @@ import java.util.stream.Collectors;
 public class IExamService implements ExamService {
 
     private final ExamRepository examRepository;
+    private final SubjectRepository subjectRepository;
 
     @Override
-    public ResponseDto save(ExamDto examDto) {
+    public ResponseDto<?> save(ExamDto examDto) {
         Optional<Exam> exam = examRepository.findByTitle(examDto.getTitle());
-        if(exam.isEmpty()){
+        Optional<Subject> subject = subjectRepository.findById(examDto.getSubjectId());
+        if(exam.isEmpty() && subject.isPresent()) {
             Exam newExam = Exam.builder()
                     .title(examDto.getTitle())
+                    .subject(subject.get())
                     .createdDate(examDto.getCreatedDate())
                     .build();
             newExam = examRepository.save(newExam);
@@ -45,8 +51,7 @@ public class IExamService implements ExamService {
 
     @Override
     public List<ExamDto> findAll() {
-        List<ExamDto> dtoList = examRepository.findAll().stream().map(ObjectMapper::convertToExamDto).collect(Collectors.toList());
-        return dtoList;
+        return examRepository.findAll().stream().map(ObjectMapper::convertToExamDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -71,8 +76,8 @@ public class IExamService implements ExamService {
 
     @Transactional
     @Override
-    public ResponseDto update(ExamDto dto) {
-        Optional<Exam> exam = examRepository.findById(dto.getId());
+    public ResponseDto<?> update(Long id, ExamDto dto) {
+        Optional<Exam> exam = examRepository.findById(id);
         if (exam.isPresent()) {
             if (!dto.getTitle().isEmpty()) {
                 exam.get().setTitle(dto.getTitle());
@@ -89,5 +94,11 @@ public class IExamService implements ExamService {
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .errorMessage("BAD REQUEST!")
                 .build();
+    }
+
+    @Override
+    public List<QuestionDto> findQuestions(Long id) {
+        Optional<Exam> exam = examRepository.findById(id);
+        return exam.get().getQuestions().stream().map(ObjectMapper::convertToQuestionDto).collect(Collectors.toList());
     }
 }

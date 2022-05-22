@@ -1,5 +1,6 @@
 package kz.meirambekuly.examtrainer.services;
 
+import kz.meirambekuly.examtrainer.web.dto.AnswerDto;
 import kz.meirambekuly.examtrainer.web.dto.QuestionDto;
 import kz.meirambekuly.examtrainer.web.dto.ResponseDto;
 
@@ -10,5 +11,6 @@ public interface QuestionService {
     List<QuestionDto> findAll();
     String remove(Long questionId);
     QuestionDto findById(Long questionId);
-    ResponseDto<?> update(QuestionDto dto);
+    ResponseDto<?> update(Long id, QuestionDto dto);
+    List<AnswerDto> findAnswers(Long id);
 }

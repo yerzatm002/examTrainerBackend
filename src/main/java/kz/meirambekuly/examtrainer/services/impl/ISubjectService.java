@@ -1,9 +1,11 @@
 package kz.meirambekuly.examtrainer.services.impl;
 
+import kz.meirambekuly.examtrainer.entities.Exam;
 import kz.meirambekuly.examtrainer.entities.Subject;
 import kz.meirambekuly.examtrainer.repositories.SubjectRepository;
 import kz.meirambekuly.examtrainer.services.SubjectService;
 import kz.meirambekuly.examtrainer.utils.ObjectMapper;
+import kz.meirambekuly.examtrainer.web.dto.ExamDto;
 import kz.meirambekuly.examtrainer.web.dto.ResponseDto;
 import kz.meirambekuly.examtrainer.web.dto.SubjectDto;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class ISubjectService implements SubjectService {
     private final SubjectRepository subjectRepository;
 
     @Override
-    public ResponseDto save(SubjectDto subjectDto) {
+    public ResponseDto<?> save(SubjectDto subjectDto) {
         Optional<Subject> subject = subjectRepository.findByTitle(subjectDto.getTitle());
         if(subject.isEmpty()){
             Subject newSubject = Subject.builder()
@@ -71,8 +73,8 @@ public class ISubjectService implements SubjectService {
 
     @Transactional
     @Override
-    public ResponseDto update(SubjectDto dto) {
-        Optional<Subject> subject = subjectRepository.findById(dto.getId());
+    public ResponseDto<?> update(SubjectDto dto, Long id) {
+        Optional<Subject> subject = subjectRepository.findById(id);
         if (subject.isPresent()) {
             if (!dto.getTitle().isEmpty()) {
                 subject.get().setTitle(dto.getTitle());
@@ -89,5 +91,11 @@ public class ISubjectService implements SubjectService {
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .errorMessage("BAD REQUEST!")
                 .build();
+    }
+
+    @Override
+    public List<ExamDto> findExams(Long id) {
+        Optional<Subject> subject = subjectRepository.findById(id);
+        return subject.get().getExams().stream().map(ObjectMapper::convertToExamDto).collect(Collectors.toList());
     }
 }

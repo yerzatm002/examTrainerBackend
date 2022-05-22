@@ -1,11 +1,13 @@
 package kz.meirambekuly.examtrainer.services.impl;
 
+import kz.meirambekuly.examtrainer.entities.Answer;
 import kz.meirambekuly.examtrainer.entities.Question;
 import kz.meirambekuly.examtrainer.repositories.AnswerRepository;
 import kz.meirambekuly.examtrainer.repositories.ExamRepository;
 import kz.meirambekuly.examtrainer.repositories.QuestionRepository;
 import kz.meirambekuly.examtrainer.services.QuestionService;
 import kz.meirambekuly.examtrainer.utils.ObjectMapper;
+import kz.meirambekuly.examtrainer.web.dto.AnswerDto;
 import kz.meirambekuly.examtrainer.web.dto.QuestionDto;
 import kz.meirambekuly.examtrainer.web.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,17 +29,40 @@ public class IQuestionService implements QuestionService {
     private final ExamRepository examRepository;
     private final AnswerRepository answerRepository;
 
+    @Transactional
     @Override
     public ResponseDto<?> save(QuestionDto dto) {
         Optional<Question> question = questionRepository.findByText(dto.getText());
+        List<Answer> answers = new ArrayList<>();
         if(question.isEmpty()){
             Question newQuestion = Question.builder()
                     .text(dto.getText())
                     .createdDate(dto.getCreatedDate())
                     .exam(examRepository.getById(dto.getExamId()))
+                    .weight(dto.getWeight())
                     .build();
-
             newQuestion = questionRepository.save(newQuestion);
+            if(!dto.getAnswerDtoList().isEmpty()){
+                for(AnswerDto answerDto : dto.getAnswerDtoList()){
+                    Answer answer = Answer.builder()
+                            .text(answerDto.getText())
+                            .question(newQuestion)
+                            .build();
+                    answer = answerRepository.save(answer);
+                    answers.add(answer);
+                }
+                newQuestion.setAnswers(answers);
+                questionRepository.save(newQuestion);
+            }
+            if (Objects.nonNull(dto.getCorrectAnswer())){
+                Answer correctAnswer = Answer.builder()
+                        .text(dto.getCorrectAnswer().getText())
+                        .question(newQuestion)
+                        .build();
+                correctAnswer = answerRepository.save(correctAnswer);
+                newQuestion.setCorrectAnswer(correctAnswer);
+                questionRepository.save(newQuestion);
+            }
             return ResponseDto.builder()
                     .isSuccess(true)
                     .httpStatus(HttpStatus.OK.value())
@@ -77,11 +103,14 @@ public class IQuestionService implements QuestionService {
 
     @Transactional
     @Override
-    public ResponseDto<?> update(QuestionDto dto) {
-        Optional<Question> question = questionRepository.findById(dto.getId());
+    public ResponseDto<?> update(Long id, QuestionDto dto) {
+        Optional<Question> question = questionRepository.findById(id);
         if (question.isPresent()) {
             if(!dto.getText().isEmpty()){
                 question.get().setText(dto.getText());
+            }
+            if(!dto.getWeight().isNaN()){
+                question.get().setWeight(dto.getWeight());
             }
             if(Objects.nonNull(dto.getCorrectAnswer())){
                 question.get().setCorrectAnswer(answerRepository.getById(dto.getCorrectAnswer().getId()));
@@ -101,5 +130,11 @@ public class IQuestionService implements QuestionService {
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .errorMessage("BAD REQUEST!")
                 .build();
+    }
+
+    @Override
+    public List<AnswerDto> findAnswers(Long id) {
+        Optional<Question> question = questionRepository.findById(id);
+        return question.get().getAnswers().stream().map(ObjectMapper :: convertToAnswerDto).collect(Collectors.toList());
     }
 }

@@ -26,24 +26,16 @@ public class IAnswerService implements AnswerService {
 
     @Override
     public ResponseDto<?> save(AnswerDto dto) {
-        Optional<Answer> answer = answerRepository.findAnswerByText(dto.getText());
-        if(answer.isPresent()){
-            Answer newAnswer = Answer.builder()
-                    .text(dto.getText())
-                    .question(questionRepository.getById(dto.getQuestionId()))
-                    .createdDate(dto.getCreatedAt())
-                    .build();
-            newAnswer = answerRepository.save(newAnswer);
-            return ResponseDto.builder()
-                    .isSuccess(true)
-                    .httpStatus(HttpStatus.OK.value())
-                    .data(newAnswer.getId())
-                    .build();
-        }
+        Answer newAnswer = Answer.builder()
+                .text(dto.getText())
+                .question(questionRepository.getById(dto.getQuestionId()))
+                .createdDate(dto.getCreatedAt())
+                .build();
+        newAnswer = answerRepository.save(newAnswer);
         return ResponseDto.builder()
-                .isSuccess(false)
-                .httpStatus(HttpStatus.BAD_REQUEST.value())
-                .errorMessage("Such answer dublicates: " + dto.getText())
+                .isSuccess(true)
+                .httpStatus(HttpStatus.OK.value())
+                .data(newAnswer.getId())
                 .build();
     }
 
@@ -74,8 +66,8 @@ public class IAnswerService implements AnswerService {
 
     @Transactional
     @Override
-    public ResponseDto<?> update(AnswerDto dto) {
-        Optional<Answer> answer = answerRepository.findById(dto.getId());
+    public ResponseDto<?> update(Long id, AnswerDto dto) {
+        Optional<Answer> answer = answerRepository.findById(id);
         if (answer.isPresent()) {
             if(!dto.getText().isEmpty()){
                 answer.get().setText(dto.getText());

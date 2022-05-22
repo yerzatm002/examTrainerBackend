@@ -4,7 +4,6 @@ import kz.meirambekuly.examtrainer.entities.*;
 import kz.meirambekuly.examtrainer.web.dto.*;
 import lombok.experimental.UtilityClass;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -31,7 +30,7 @@ public class ObjectMapper {
         return SubjectDto.builder()
                 .id(subject.getId())
                 .title(subject.getTitle())
-                .numbOfExams(subject.getExams().size()+1)
+                .numbOfExams(subject.getExams().size())
                 .createdDate(subject.getCreatedDate())
                 .build();
     }
@@ -40,7 +39,8 @@ public class ObjectMapper {
         return ExamDto.builder()
                 .id(exam.getId())
                 .title(exam.getTitle())
-                .numbOfQuestions(exam.getQuestions().size()+1)
+                .subjectId(exam.getSubject().getId())
+                .numbOfQuestions(exam.getQuestions().size())
                 .createdDate(exam.getCreatedDate())
                 .build();
     }
@@ -52,6 +52,8 @@ public class ObjectMapper {
                 .examId(question.getExam().getId())
                 .weight(question.getWeight())
                 .answerDtoList(question.getAnswers().stream().map(ObjectMapper::convertToAnswerDto).collect(Collectors.toList()))
+                .correctAnswer(convertToAnswerDto(question.getCorrectAnswer()))
+                .createdDate(question.getCreatedDate())
                 .build();
     }
 

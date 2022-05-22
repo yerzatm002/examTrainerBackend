@@ -10,5 +10,5 @@ public interface AnswerService {
     List<AnswerDto> findAll();
     String remove(Long answerId);
     AnswerDto findById(Long answerId);
-    ResponseDto<?> update(AnswerDto dto);
+    ResponseDto<?> update(Long id, AnswerDto dto);
 }
